@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SR FOOD'S</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    body {font-family: Arial; margin:0; background:#fff8f0;}
+    header {background:#b30000; color:white; padding:20px; text-align:center;}
+    section {padding:20px;}
+    input, select {width:100%; padding:10px; margin:8px 0;}
+    button {background:#b30000; color:white; padding:12px; border:none; width:100%; font-size:16px;}
+    footer {background:#222; color:white; text-align:center; padding:15px;}
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>SR FOOD'S</h1>
+  <p>Traditional Taste, Homemade Love</p>
+</header>
+
+<section>
+  <h2>Place Your Order</h2>
+
+  <label>Choose Product</label>
+  <select id="product">
+    <option value="800">Chicken Pickle - ₹800</option>
+    <option value="1450">Mutton Pickle - ₹1450</option>
+    <option value="900">Chicken Boneless Pickle - ₹900</option>
+    <option value="750">Chicken Gongura Pickle - ₹750</option>
+  </select>
+
+  <label>Quantity</label>
+  <input type="number" id="quantity" value="1" min="1">
+
+  <label>Your Name</label>
+  <input type="text" id="name" required>
+
+  <label>Phone Number</label>
+  <input type="tel" id="phone" required>
+
+  <label>Delivery Address</label>
+  <input type="text" id="address" required>
+
+  <button onclick="payNow()">Pay Now</button>
+</section>
+
+<footer>
+  📍 Ravulapalem | 📞 9492369911
+</footer>
+
+<script>
+function payNow() {
+  var price = document.getElementById("product").value;
+  var quantity = document.getElementById("quantity").value;
+  var total = price * quantity;
+
+  var options = {
+    "key": "rzp_live_SI5VMj6l9U45sn",
+    "amount": total * 100,
+    "currency": "INR",
+    "name": "SR FOOD'S",
+    "description": "Food Order Payment",
+    "handler": function (response){
+        alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+    },
+    "prefill": {
+        "name": document.getElementById("name").value,
+        "contact": document.getElementById("phone").value
+    },
+    "theme": {
+        "color": "#b30000"
+    }
+  };
+
+  var rzp1 = new Razorpay(options);
+  rzp1.open();
+}
+</script>
+
+</body>
+</html>
