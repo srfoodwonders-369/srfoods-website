@@ -3,59 +3,126 @@
 <head>
   <title>SR FOOD'S</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <!-- Razorpay -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
   <style>
-    body {font-family: Arial; margin:0; background:#fff8f0;}
-    header {background:#b30000; color:white; padding:20px; text-align:center;}
-    section {padding:20px;}
-    input, select {width:100%; padding:10px; margin:8px 0;}
-    button {background:#b30000; color:white; padding:12px; border:none; width:100%; font-size:16px;}
-    footer {background:#222; color:white; text-align:center; padding:15px;}
+    body { font-family: Arial; margin:0; background:#f2f2f2; }
+    header { background:white; padding:15px; font-size:22px; font-weight:bold; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    .container { padding:15px; max-width:500px; margin:auto; }
+    .card { background:white; padding:15px; margin-bottom:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+    button { background:#fc8019; color:white; border:none; padding:10px; width:100%; border-radius:6px; font-size:16px; }
+    select, input { width:100%; padding:8px; margin:8px 0; border-radius:5px; border:1px solid #ccc; }
+    h3 { margin-top:0; }
   </style>
 </head>
 
 <body>
 
-<header>
-  <h1>SR FOOD'S</h1>
-  <p>Traditional Taste, Homemade Love</p>
-</header>
+<header>SR FOOD'S</header>
 
-<section>
-  <h2>Place Your Order</h2>
+<div class="container">
 
-  <label>Choose Product</label>
-  <select id="product">
-    <option value="800">Chicken Pickle - ₹800</option>
-    <option value="1450">Mutton Pickle - ₹1450</option>
-    <option value="900">Chicken Boneless Pickle - ₹900</option>
-    <option value="750">Chicken Gongura Pickle - ₹750</option>
-  </select>
+<div class="card">
+<h3>Customer Login (Phone OTP)</h3>
+<input type="text" id="phone" placeholder="+91XXXXXXXXXX">
+<div id="recaptcha-container"></div>
+<button onclick="sendOTP()">Send OTP</button>
+<input type="text" id="otp" placeholder="Enter OTP">
+<button onclick="verifyOTP()">Verify OTP</button>
+</div>
 
-  <label>Quantity</label>
-  <input type="number" id="quantity" value="1" min="1">
+<div class="card">
+<h3>Place Order</h3>
 
-  <label>Your Name</label>
-  <input type="text" id="name" required>
+<label>Select Delivery Location</label>
+<select id="location">
+  <option value="local">Ravulapalem</option>
+  <option value="district">District</option>
+  <option value="state">Andhra Pradesh</option>
+  <option value="otherState">Other State</option>
+</select>
 
-  <label>Phone Number</label>
-  <input type="tel" id="phone" required>
+<label>Enter Product Amount (₹)</label>
+<input type="number" id="amount" placeholder="Example: 900">
 
-  <label>Delivery Address</label>
-  <input type="text" id="address" required>
+<button onclick="payNow()">Pay Now</button>
 
-  <button onclick="payNow()">Pay Now</button>
-</section>
+<p id="totalText"></p>
 
-<footer>
-  📍 Ravulapalem | 📞 9492369911
-</footer>
+</div>
+
+</div>
 
 <script>
-function payNow() {
-  var price = document.getElementById("product").value;
-  var quantity = document.getElementById("quantity").value;
-  var total = price * quantity;
+
+// Initialize Firebase
+firebase.initializeApp({
+  apiKey: "AIzaSyCHg-gxVV-vuALSZgcGBabChPZnznTlySg",
+  authDomain: "sr-food-wonders-demo.firebaseapp.com",
+  projectId: "sr-food-wonders-demo",
+  storageBucket: "sr-food-wonders-demo.firebasestorage.app",
+  messagingSenderId: "895619294540",
+  appId: "1:895619294540:web:72cee3f5756daa116b1be9"
+});
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Recaptcha setup
+window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+  size: 'normal'
+});
+
+// Send OTP
+function sendOTP(){
+  const phone = document.getElementById('phone').value;
+  auth.signInWithPhoneNumber(phone, window.recaptchaVerifier)
+    .then(function(result){
+      window.confirmationResult = result;
+      alert("OTP Sent Successfully");
+    })
+    .catch(function(error){
+      alert(error.message);
+    });
+}
+
+// Verify OTP
+function verifyOTP(){
+  const otp = document.getElementById('otp').value;
+  confirmationResult.confirm(otp)
+    .then(function(){
+      alert("Login Successful");
+    })
+    .catch(function(error){
+      alert("Invalid OTP");
+    });
+}
+
+// Payment Function
+async function payNow(){
+
+  const location = document.getElementById("location").value;
+  const amount = Number(document.getElementById("amount").value);
+
+  if(!amount){
+    alert("Enter product amount");
+    return;
+  }
+
+  const doc = await db.collection("settings").doc("shipping").get();
+  const shipping = doc.data()[location];
+
+  const total = amount + shipping;
+
+  document.getElementById("totalText").innerHTML = 
+    "Product ₹"+amount+" + Shipping ₹"+shipping+" = Total ₹"+total;
 
   var options = {
     "key": "rzp_live_SI5VMj6l9U45sn",
@@ -66,18 +133,15 @@ function payNow() {
     "handler": function (response){
         alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
     },
-    "prefill": {
-        "name": document.getElementById("name").value,
-        "contact": document.getElementById("phone").value
-    },
     "theme": {
-        "color": "#b30000"
+        "color": "#fc8019"
     }
   };
 
   var rzp1 = new Razorpay(options);
   rzp1.open();
 }
+
 </script>
 
 </body>
