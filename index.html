@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SR FOOD'S</title>
 
 <!-- Firebase -->
@@ -14,14 +14,23 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <style>
-body { font-family: Arial, sans-serif; margin:0; background:#f9f9f9; }
+body { margin:0; font-family:Arial, sans-serif; background:#f9f9f9; }
+.container { max-width:1200px; margin:auto; padding:20px; }
+h1,h2,h3,p { margin:5px 0; }
+
+/* Center login logo */
+#login-choice, #login-form, #register-form { display:none; text-align:center; margin-top:100px; }
+#login-choice button { margin:10px; padding:12px 20px; background:#fc8019; color:white; border:none; border-radius:6px; cursor:pointer; font-size:16px; }
+#login-choice button:hover { background:#e67300; }
+
+/* Forms */
+input { width:90%; padding:8px; margin:5px 0; border-radius:5px; border:1px solid #ccc; font-size:16px; }
+
+/* Header */
 header { display:flex; align-items:center; justify-content:space-between; padding:15px 20px; background:white; box-shadow:0 2px 5px rgba(0,0,0,0.1); position:fixed; width:100%; z-index:1000;}
 header h1 { color:#fc8019; margin:0; font-size:24px; }
 header img.logo { height:50px; margin-right:10px; }
 header .icons { display:flex; align-items:center; gap:15px; }
-button { background:#fc8019; color:white; border:none; padding:10px 15px; border-radius:6px; font-size:16px; cursor:pointer; }
-button:hover { background:#e67300; }
-.container { padding:100px 20px 50px 20px; max-width:1200px; margin:auto; }
 
 /* Slide menu */
 .slide-menu { position:fixed; top:0; left:-300px; width:300px; height:100%; background:white; box-shadow:2px 0 10px rgba(0,0,0,0.2); transition:0.3s; z-index:1100; padding:20px; overflow-y:auto; }
@@ -32,27 +41,15 @@ button:hover { background:#e67300; }
 .slide-menu .profile { text-align:center; margin-bottom:20px; }
 .slide-menu .profile img { width:80px; height:80px; border-radius:50%; margin-bottom:10px; }
 
-/* Grid Products */
-#products {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 15px;
-}
-.product-card { 
-  display:flex; 
-  flex-direction:column; 
-  align-items:center; 
-  padding:15px; 
-  border-radius:10px; 
-  box-shadow:0 2px 5px rgba(0,0,0,0.1);
-  background:white;
-}
+/* Product Grid */
+#products { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:15px; margin-top:20px; }
+.product-card { background:white; border-radius:10px; padding:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:flex; flex-direction:column; align-items:center; }
 .product-card img { width:100%; height:150px; object-fit:cover; border-radius:8px; }
 .product-card .details { text-align:center; margin:10px 0; }
-.product-card .actions { width:100%; display:flex; justify-content:space-between; align-items:center; gap:5px; }
-.product-card .disclaimer { font-size:14px; color:#555; margin-top:5px; display:none; }
+.product-card .actions { display:flex; gap:5px; width:100%; justify-content:space-between; }
+.product-card .disclaimer { font-size:14px; color:#555; display:none; margin-top:5px; }
 
-/* Cart Summary */
+/* Cart */
 #cart-container { margin-top:30px; display:none; }
 .cart-item { display:flex; justify-content:space-between; background:#fff; padding:10px; margin-bottom:10px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
 .cart-item input { width:50px; padding:3px; }
@@ -60,32 +57,56 @@ button:hover { background:#e67300; }
 #cart-bill { font-weight:bold; margin-top:10px; }
 
 /* About Us */
-.about-us { padding:50px 20px; text-align:center; background:#f9f9f9; }
+.about-us { padding:50px 20px; text-align:center; background:#f9f9f9; display:none; }
 .about-us img.logo { height:100px; margin-bottom:10px; }
 .about-us h1 { color:#fc8019; margin:5px 0; }
 .about-us h3 { color:#333; margin:5px 0; }
 .about-us p { max-width:700px; margin:auto; line-height:1.7; color:#333; }
-.about-us .contact a { color:#fc8019; text-decoration:none; font-weight:bold; margin:0 5px; }
+.about-us .contact a { margin:0 5px; text-decoration:none; color:white; font-weight:bold; padding:10px 15px; border-radius:8px; display:inline-flex; align-items:center; gap:5px; }
+.instagram-btn { background:#fc8019; }
+.whatsapp-btn { background:#25D366; }
 
-/* Review Section */
-.review-section { padding:30px 20px; max-width:700px; margin:auto; background:white; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-top:30px; }
-.review-section h3 { margin-top:0; }
-.review-section textarea { width:100%; padding:8px; margin:5px 0; border-radius:5px; border:1px solid #ccc; }
-.review-section input[type="text"] { width:100%; padding:8px; margin:5px 0; border-radius:5px; border:1px solid #ccc; }
-.review-section button { width:100%; padding:10px; margin-top:5px; }
+/* Reviews */
+.review-section { padding:30px 20px; max-width:700px; margin:auto; background:white; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-top:30px; display:none; }
+.review-section textarea, .review-section input[type=text] { width:100%; padding:8px; margin:5px 0; border-radius:5px; border:1px solid #ccc; }
 
 /* Responsive */
-@media(max-width:768px){
-  header h1 { font-size:20px; }
-  header img.logo { height:40px; }
-}
+@media(max-width:768px){ header h1 { font-size:20px; } header img.logo { height:40px; } }
 </style>
 </head>
 <body>
 
-<header>
+<!-- Initial Login Choice -->
+<div id="login-choice" class="container">
+  <img src="your-logo.png" alt="Logo" style="height:80px;">
+  <h1>SR FOOD'S</h1>
+  <button onclick="showNewCustomer()">I am a New Customer</button>
+  <button onclick="showExistingCustomer()">I am an Existing Customer</button>
+</div>
+
+<!-- Login Form -->
+<div id="login-form" class="container">
+  <h2>Login</h2>
+  <input type="email" id="login-email" placeholder="Email"><br>
+  <input type="password" id="login-password" placeholder="Password"><br>
+  <button onclick="loginEmail()">Login</button><br>
+  <button onclick="loginGoogle()">Login with Google</button>
+  <p style="margin-top:10px; cursor:pointer; color:#fc8019;" onclick="backToChoice()">← Back</p>
+</div>
+
+<!-- Register Form -->
+<div id="register-form" class="container">
+  <h2>Register</h2>
+  <input type="email" id="register-email" placeholder="Email"><br>
+  <input type="password" id="register-password" placeholder="Password"><br>
+  <button onclick="registerEmail()">Register</button><br>
+  <button onclick="backToChoice()">← Back</button>
+</div>
+
+<!-- Header after login -->
+<header id="main-header" style="display:none;">
   <div style="display:flex; align-items:center;">
-    <img src="your-logo.png" alt="SR FOOD'S Logo" class="logo">
+    <img src="your-logo.png" class="logo" alt="Logo">
     <h1>SR FOOD'S</h1>
   </div>
   <div class="icons">
@@ -111,39 +132,11 @@ button:hover { background:#e67300; }
   </div>
 </div>
 
-<div class="container">
-
-  <!-- Login/Register -->
-  <div class="card" id="login-card">
-    <h3>Login / Register</h3>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="loginEmail()">Login</button>
-    <button onclick="registerEmail()">Register</button>
-    <hr>
-    <button onclick="loginGoogle()">Login with Google</button>
-  </div>
-
-  <!-- Personal Details & Address -->
-  <div class="card" id="details-card" style="display:none; margin-top:30px;">
-    <h3>Personal Details & Address</h3>
-    <input type="text" id="cust-name" placeholder="Full Name" required><br>
-    <input type="text" id="cust-phone" placeholder="Phone Number" required><br>
-    <input type="text" id="door" placeholder="Door No" required><br>
-    <input type="text" id="street" placeholder="Street Name" required><br>
-    <input type="text" id="landmark" placeholder="Landmark"><br>
-    <input type="text" id="village" placeholder="Village"><br>
-    <input type="text" id="pincode" placeholder="Pincode" required><br>
-    <input type="text" id="district" placeholder="District" required><br>
-    <input type="text" id="city" placeholder="City" required><br>
-    <input type="text" id="state" placeholder="State" required><br>
-    <button onclick="proceedToProducts()">Save Details</button>
-  </div>
-
+<div class="container" id="main-content" style="display:none;">
   <h2 style="margin:30px 0;">Our Menu</h2>
   <div id="products"></div>
 
-  <!-- Cart & Bill -->
+  <!-- Cart -->
   <div id="cart-container">
     <h3>Cart & Bill</h3>
     <div id="cart-items"></div>
@@ -153,26 +146,20 @@ button:hover { background:#e67300; }
 </div>
 
 <!-- About Us -->
-<section class="about-us">
-  <img src="your-logo.png" alt="SR FOOD'S Logo" class="logo">
+<section class="about-us" id="about-us">
+  <img src="your-logo.png" class="logo">
   <h1>SR FOOD'S</h1>
   <h3>AUTHENTIC GODAVARI TASTE</h3>
   <p>Since 2024</p>
-  <p>Welcome to SR FOOD’S – your destination for the finest pickles, sweets, snacks, and SR FOOD’S Specials made with love, quality, and authentic taste. 
-    We take pride in crafting our products using traditional recipes and premium ingredients, ensuring a unique taste in every bite.
-  </p>
+  <p>Welcome to SR FOOD’S – your destination for the finest pickles, sweets, snacks, and SR FOOD’S Specials made with love, quality, and authentic taste.</p>
   <div style="margin-top:20px; display:flex; justify-content:center; gap:20px;">
-    <a href="https://www.instagram.com/sr_foods_offical" target="_blank" style="display:flex; align-items:center; gap:5px; background:#fc8019; color:white; font-weight:bold; padding:10px 15px; border-radius:8px; text-decoration:none;">
-      <img src="instagram-logo.png" alt="Instagram" style="height:20px;"> Follow us
-    </a>
-    <a href="https://wa.me/9492369911" target="_blank" style="display:flex; align-items:center; gap:5px; background:#25D366; color:white; font-weight:bold; padding:10px 15px; border-radius:8px; text-decoration:none;">
-      <img src="whatsapp-logo.png" alt="WhatsApp" style="height:20px;"> Contact Us
-    </a>
+    <a href="https://www.instagram.com/sr_foods_offical" target="_blank" class="instagram-btn">Instagram</a>
+    <a href="https://wa.me/9492369911" target="_blank" class="whatsapp-btn">WhatsApp</a>
   </div>
 </section>
 
 <!-- Reviews -->
-<div class="review-section">
+<div class="review-section" id="review-section">
   <h3>Customer Reviews</h3>
   <input type="text" id="review-name" placeholder="Your Name">
   <textarea id="review-comment" placeholder="Write your review here"></textarea>
@@ -181,7 +168,7 @@ button:hover { background:#e67300; }
 </div>
 
 <script>
-// Firebase config
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyCHg-gxVV-vuALSZgcGBabChPZnznTlySg",
   authDomain: "sr-food-wonders-demo.firebaseapp.com",
@@ -194,52 +181,70 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Slide menu toggle
-document.getElementById('menu-toggle').addEventListener('click', ()=>{
-  document.getElementById('slide-menu').classList.toggle('active');
-});
+// Login/Register choice flow
+function showNewCustomer(){ 
+  document.getElementById('login-choice').style.display='none'; 
+  document.getElementById('register-form').style.display='block';
+}
+function showExistingCustomer(){ 
+  document.getElementById('login-choice').style.display='none'; 
+  document.getElementById('login-form').style.display='block';
+}
+function backToChoice(){ 
+  document.getElementById('login-form').style.display='none';
+  document.getElementById('register-form').style.display='none';
+  document.getElementById('login-choice').style.display='block';
+}
 
-// Login/Register
+// Firebase Auth functions
 function registerEmail(){
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+  const email = document.getElementById('register-email').value;
+  const password = document.getElementById('register-password').value;
   auth.createUserWithEmailAndPassword(email,password)
-  .then(u=>{
-    alert("Registered successfully");
-    showDetailsCard(u.user);
-  }).catch(err=>alert(err.message));
+    .then(u=>{
+      alert("Registered successfully!");
+      afterLogin(u.user);
+    }).catch(err=>alert(err.message));
 }
 
 function loginEmail(){
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
   auth.signInWithEmailAndPassword(email,password)
-  .then(u=>{
-    alert("Login successful");
-    showDetailsCard(u.user);
-  }).catch(err=>alert(err.message));
+    .then(u=>{
+      alert("Login successful!");
+      afterLogin(u.user);
+    }).catch(err=>alert(err.message));
 }
 
 function loginGoogle(){
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).then(result=>{
-    alert("Google login successful");
-    showDetailsCard(result.user);
+    afterLogin(result.user);
   }).catch(err=>alert(err.message));
-}
-
-function showDetailsCard(user){
-  document.getElementById('login-card').style.display='none';
-  document.getElementById('details-card').style.display='block';
-  document.getElementById('profile-name').innerText = user.displayName || "New User";
-  document.getElementById('profile-email').innerText = user.email;
 }
 
 function logout(){
   auth.signOut().then(()=>location.reload());
 }
 
-function proceedToProducts(){ alert("Details saved! You can now shop."); }
+// After login show main content
+function afterLogin(user){
+  document.getElementById('login-choice').style.display='none';
+  document.getElementById('login-form').style.display='none';
+  document.getElementById('register-form').style.display='none';
+  document.getElementById('main-header').style.display='flex';
+  document.getElementById('main-content').style.display='block';
+  document.getElementById('about-us').style.display='block';
+  document.getElementById('review-section').style.display='block';
+  document.getElementById('profile-name').innerText = user.displayName || "New User";
+  document.getElementById('profile-email').innerText = user.email;
+}
+
+// Slide menu toggle
+document.getElementById('menu-toggle').addEventListener('click', ()=>{
+  document.getElementById('slide-menu').classList.toggle('active');
+});
 
 // Products & Cart
 const productsData = [
@@ -303,9 +308,4 @@ function updateCart(){
   cart.forEach((item,i)=>{
     total += item.price*item.qty;
     const div = document.createElement('div'); div.className='cart-item';
-    div.innerHTML=`<span>${item.name} (₹${item.price})</span>
-      <div>Qty: <input type="number" value="${item.qty}" min="1" onchange="changeQty(${i},this.value)">
-      <button onclick="removeItem(${i})">Remove</button></div>`;
-    cartItems.appendChild(div);
-  });
-  document.getElementById('cart
+    div.innerHTML=`<span>${item.name} (₹${item.price})
