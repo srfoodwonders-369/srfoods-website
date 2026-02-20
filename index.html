@@ -1,88 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>SR FOOD'S</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SR FOOD'S</title>
 
-  <!-- Firebase CDN -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-  <!-- Razorpay -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!-- Razorpay -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  <style>
-    body { font-family: Arial; margin:0; background:#f2f2f2; }
-    header { background:white; padding:15px; font-size:22px; font-weight:bold; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-    .container { padding:15px; max-width:600px; margin:auto; }
-    .card { background:white; padding:15px; margin-bottom:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-    button { background:#fc8019; color:white; border:none; padding:10px; width:100%; border-radius:6px; font-size:16px; cursor:pointer; }
-    select, input, textarea { width:100%; padding:8px; margin:8px 0; border-radius:5px; border:1px solid #ccc; }
-    h3 { margin-top:0; }
-    hr { border:0; border-top:1px solid #ccc; }
-    #profileCard img { width:80px; height:80px; border-radius:50%; margin-bottom:10px; }
-  </style>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ===== Base ===== */
+* { margin:0; padding:0; box-sizing:border-box; font-family: 'Roboto', sans-serif; }
+body { background:#f8f8f8; color:#333; }
+header { background:#fc8019; color:white; padding:15px; font-size:22px; font-weight:700; text-align:center; position:sticky; top:0; z-index:10; }
+
+/* ===== Container ===== */
+.container { max-width:720px; margin:auto; padding:15px; }
+
+/* ===== Cards ===== */
+.card { background:white; padding:15px; margin-bottom:15px; border-radius:12px; box-shadow:0 6px 15px rgba(0,0,0,0.08); transition:0.3s; }
+.card:hover { box-shadow:0 8px 20px rgba(0,0,0,0.12); transform:translateY(-2px); }
+
+/* ===== Inputs ===== */
+input, select, textarea { width:100%; padding:12px; margin:6px 0 12px 0; border-radius:8px; border:1px solid #ccc; font-size:14px; }
+textarea { resize:none; }
+
+/* ===== Buttons ===== */
+button { background:linear-gradient(45deg,#fc8019,#ffb347); color:white; border:none; padding:12px; border-radius:10px; font-size:16px; cursor:pointer; transition:0.3s; width:100%; }
+button:hover { opacity:0.9; transform:translateY(-2px); }
+
+/* ===== Profile ===== */
+.profile-img { width:80px; height:80px; border-radius:50%; margin-bottom:10px; object-fit:cover; }
+
+/* ===== Product Cards ===== */
+.product-card { display:flex; align-items:center; margin-bottom:12px; padding:10px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition:0.3s; background:white; }
+.product-card:hover { box-shadow:0 8px 20px rgba(0,0,0,0.12); transform:translateY(-3px); }
+.product-card img { width:80px; height:80px; border-radius:12px; object-fit:cover; margin-right:12px; }
+.product-details { flex:1; }
+
+/* ===== Category Tabs ===== */
+.category-tabs { display:flex; overflow-x:auto; margin-bottom:15px; }
+.category-tabs button { margin-right:10px; flex:none; min-width:120px; font-size:14px; }
+
+/* ===== Cart ===== */
+.cart-summary { position:fixed; bottom:20px; right:20px; background:white; padding:15px; border-radius:12px; box-shadow:0 6px 15px rgba(0,0,0,0.15); width:250px; transition:0.3s; display:none; }
+.cart-summary.show { transform:translateY(0); opacity:1; }
+
+/* ===== Help Desk ===== */
+.help-msg { background:#fff4e6; padding:10px; border-radius:10px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,0.05); animation:fadeIn 0.5s ease; }
+
+/* ===== Animations ===== */
+@keyframes fadeIn { 0% {opacity:0; transform:translateY(10px);} 100% {opacity:1; transform:translateY(0);} }
+</style>
 </head>
 
 <body>
-
 <header>SR FOOD'S</header>
-
 <div class="container">
 
-  <!-- Customer Profile -->
+  <!-- Profile Card -->
   <div class="card" id="profileCard" style="display:none; text-align:center;">
-    <img id="profilePic" src="" alt="Profile Picture">
+    <img id="profilePic" src="" class="profile-img">
     <h3 id="profileName"></h3>
     <p id="profileEmail"></p>
     <button onclick="logout()" style="background:#ff4d4d;">Logout</button>
   </div>
 
-  <!-- Customer Login -->
-  <div class="card">
-    <h3>Customer Login</h3>
-    <button onclick="googleLogin()" style="background:#4285F4; color:white;">Login with Google</button>
-    <hr>
+  <!-- Login / Register -->
+  <div class="card" id="loginCard">
+    <h3>Welcome</h3>
+    <button onclick="googleLogin()" style="background:#4285F4;">Login with Google</button>
+    <hr style="margin:12px 0;">
     <input type="email" id="emailLogin" placeholder="Enter Email">
     <input type="password" id="passwordLogin" placeholder="Enter Password">
     <button onclick="emailLogin()">Login with Email</button>
     <button onclick="emailRegister()">Register</button>
   </div>
 
-  <!-- Customer Details Form -->
+  <!-- New Customer Details -->
   <div class="card" id="customerCard" style="display:none;">
     <h3>Customer Details</h3>
-    <label>Name</label>
-    <input type="text" id="custName" placeholder="Enter your full name">
-    <label>Phone Number</label>
+    <input type="text" id="custName" placeholder="Full Name">
     <input type="text" id="custPhone" placeholder="+91XXXXXXXXXX">
-    <label>Delivery Address</label>
-    <input type="text" id="custAddress" placeholder="Street, City, PIN">
+    <input type="text" id="custDoor" placeholder="Door / House Number">
+    <input type="text" id="custStreet" placeholder="Street / Landmark">
+    <input type="text" id="custVillage" placeholder="Village / Locality">
+    <input type="text" id="custPincode" placeholder="PIN Code">
+    <input type="text" id="custDistrict" placeholder="District">
+    <input type="text" id="custCity" placeholder="City">
+    <input type="text" id="custState" placeholder="State">
     <button onclick="saveCustomerDetails()">Save Details</button>
   </div>
 
-  <!-- Products -->
-  <div class="card" id="productsCard">
-    <h3>Our Products</h3>
-    <div class="product" style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:6px;">
-      <h4>Chicken Boneless Pickle</h4>
-      <p>Price: ₹900 / kg</p>
-      <label>Quantity (kg)</label>
-      <input type="number" min="1" value="1" class="productQty" data-price="900">
-      <button onclick="addToCart(this)">Add to Cart</button>
-    </div>
-    <div class="product" style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:6px;">
-      <h4>Mutton Boneless Pickle</h4>
-      <p>Price: ₹1650 / kg</p>
-      <label>Quantity (kg)</label>
-      <input type="number" min="1" value="1" class="productQty" data-price="1650">
-      <button onclick="addToCart(this)">Add to Cart</button>
-    </div>
+  <!-- Category Tabs -->
+  <div class="category-tabs" id="categoryTabs" style="display:none;">
+    <button onclick="filterCategory('veg')">Veg Pickles</button>
+    <button onclick="filterCategory('nonveg')">Non-Veg Pickles</button>
+    <button onclick="filterCategory('sweets')">Sweets</button>
+    <button onclick="filterCategory('chikkis')">Chikkis</button>
+    <button onclick="filterCategory('specials')">SR Specials</button>
   </div>
 
+  <!-- Products -->
+  <div class="card" id="productsCard" style="display:none;"></div>
+
   <!-- Place Order -->
-  <div class="card">
+  <div class="card" id="orderCard" style="display:none;">
     <h3>Place Order</h3>
     <label>Select Delivery Location</label>
     <select id="location">
@@ -96,214 +127,224 @@
   </div>
 
   <!-- Customer Help Desk -->
-  <div class="card" id="helpDeskCard">
+  <div class="card" id="helpDeskCard" style="display:none;">
     <h3>Customer Help Desk</h3>
-    <label>Your Message</label>
-    <textarea id="helpMessage" placeholder="Write your query or feedback..." rows="4"></textarea>
+    <textarea id="helpMessage" placeholder="Write your query..." rows="4"></textarea>
     <button onclick="sendHelpMessage()">Send Message</button>
+    <div id="helpMessages"></div>
   </div>
 
 </div>
 
+<!-- Cart Summary -->
+<div class="cart-summary" id="cartSummary">
+  <h4>Cart</h4>
+  <div id="cartItems"></div>
+  <p id="cartTotal"></p>
+</div>
+
 <script>
-// Firebase Init
-firebase.initializeApp({
-  apiKey: "AIzaSyCHg-gxVV-vuALSZgcGBabChPZnznTlySg",
-  authDomain: "sr-food-wonders-demo.firebaseapp.com",
-  projectId: "sr-food-wonders-demo",
-  storageBucket: "sr-food-wonders-demo.firebasestorage.app",
-  messagingSenderId: "895619294540",
-  appId: "1:895619294540:web:72cee3f5756daa116b1be9"
-});
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-// Show Profile
-function showProfile(user) {
-  document.getElementById("profileCard").style.display = "block";
-  document.getElementById("profileName").innerText = user.displayName || document.getElementById("custName").value;
-  document.getElementById("profileEmail").innerText = user.email;
-  document.getElementById("profilePic").src = user.photoURL || "https://via.placeholder.com/80";
-}
-
-// Google Login
-function googleLogin() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider)
-    .then((result) => {
-      const user = result.user;
-      alert("Login Successful! Welcome " + user.displayName);
-      showProfile(user);
-      document.getElementById("customerCard").style.display = "block";
-      document.getElementById("custName").value = user.displayName || "";
-      listenShipping(user.uid);
-    }).catch((error) => alert(error.message));
-}
-
-// Email Login/Register
-function emailLogin() {
-  const email = document.getElementById("emailLogin").value;
-  const password = document.getElementById("passwordLogin").value;
-  if(!email || !password){ alert("Enter email and password"); return; }
-  auth.signInWithEmailAndPassword(email, password)
-    .then((result) => {
-      const user = result.user;
-      alert("Login Successful! Welcome " + user.email);
-      showProfile(user);
-      document.getElementById("customerCard").style.display = "block";
-      listenShipping(user.uid);
-    }).catch((error) => alert(error.message + "\nIf user not registered, please register first."));
-}
-function emailRegister() {
-  const email = document.getElementById("emailLogin").value;
-  const password = document.getElementById("passwordLogin").value;
-  if(!email || !password){ alert("Enter email and password"); return; }
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(() => alert("Registration successful! Please login now."))
-    .catch((error) => alert(error.message));
-}
-
-// Logout
-function logout() {
-  auth.signOut().then(() => {
-    alert("Logged out successfully!");
-    document.getElementById("profileCard").style.display = "none";
-    document.getElementById("customerCard").style.display = "none";
-    document.getElementById("custName").value = "";
-    document.getElementById("custPhone").value = "";
-    document.getElementById("custAddress").value = "";
+  // Firebase Init
+  firebase.initializeApp({
+    apiKey: "AIzaSyCHg-gxVV-vuALSZgcGBabChPZnznTlySg",
+    authDomain: "sr-food-wonders-demo.firebaseapp.com",
+    projectId: "sr-food-wonders-demo",
+    storageBucket: "sr-food-wonders-demo.firebasestorage.app",
+    messagingSenderId: "895619294540",
+    appId: "1:895619294540:web:72cee3f5756daa116b1be9"
   });
-}
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-// Customer Details
-function saveCustomerDetails() {
-  const name = document.getElementById("custName").value;
-  const phone = document.getElementById("custPhone").value;
-  const address = document.getElementById("custAddress").value;
-  const user = auth.currentUser;
-  if(!user){ alert("Please login first"); return; }
-  if(!name || !phone || !address){ alert("Please fill all details"); return; }
-  db.collection('users').doc(user.uid).set({
-    name, phone, address, email: user.email, profilePic: user.photoURL
-  }, { merge:true }).then(() => alert("Customer details saved successfully!"))
-    .catch((error) => alert(error.message));
-}
+  // Profile Display
+  function showProfile(user){
+    document.getElementById("profileCard").style.display="block";
+    document.getElementById("profileName").innerText = user.displayName || document.getElementById("custName").value;
+    document.getElementById("profileEmail").innerText = user.email;
+    document.getElementById("profilePic").src = user.photoURL || "https://via.placeholder.com/80";
+  }
 
-// Products & Cart
-let cart = [];
-function addToCart(btn) {
-  const productDiv = btn.parentElement;
-  const name = productDiv.querySelector("h4").innerText;
-  const price = Number(productDiv.querySelector(".productQty").dataset.price);
-  const qty = Number(productDiv.querySelector(".productQty").value);
-  cart.push({ name, price, qty });
-  alert(name + " added to cart!");
-}
-
-// Payment
-async function payNow(){
-  if(cart.length === 0){ alert("Please add products to cart first!"); return; }
-  const location = document.getElementById("location").value;
-  const doc = await db.collection("settings").doc("shipping").get();
-  const shipping = doc.exists ? doc.data()[location] || 0 : 0;
-  let totalAmount = 0;
-  cart.forEach(item => totalAmount += item.price * item.qty);
-  const total = totalAmount + shipping;
-  document.getElementById("totalText").innerHTML = 
-    "Products ₹"+totalAmount+" + Shipping ₹"+shipping+" = Total ₹"+total;
-
-  var options = {
-    key: "rzp_live_SI5VMj6l9U45sn",
-    amount: total*100,
-    currency: "INR",
-    name: "SR FOOD'S",
-    description: "Food Order Payment",
-    handler: function(response){
-      alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-      saveOrder(response.razorpay_payment_id);
-    },
-    theme:{ color:"#fc8019" }
-  };
-  var rzp1 = new Razorpay(options);
-  rzp1.open();
-}
-
-// Save Order
-function saveOrder(paymentId){
-  const user = auth.currentUser;
-  const location = document.getElementById("location").value;
-  db.collection("orders").add({
-    userId:user.uid,
-    name:document.getElementById("custName").value,
-    phone:document.getElementById("custPhone").value,
-    address:document.getElementById("custAddress").value,
-    cart:cart,
-    location:location,
-    paymentId:paymentId,
-    status:"pending",
-    timestamp:firebase.firestore.FieldValue.serverTimestamp()
-  }).then(()=>{ alert("Order saved successfully!"); cart=[]; });
-}
-
-// Help Desk
-function sendHelpMessage() {
-  const message = document.getElementById("helpMessage").value;
-  const user = auth.currentUser;
-  if(!user){ alert("Please login first"); return; }
-  if(!message){ alert("Please enter your message."); return; }
-  db.collection("helpdesk").add({
-    userId:user.uid,
-    name:document.getElementById("custName").value,
-    email:user.email,
-    message,
-    timestamp:firebase.firestore.FieldValue.serverTimestamp(),
-    status:"pending"
-  }).then(()=>{
-    alert("Your message has been sent! Our team will contact you soon.");
-    document.getElementById("helpMessage").value="";
-  }).catch((error)=>alert("Error sending message: "+error.message));
-}
-
-// Notifications
-function listenShipping(userId){
-  db.collection("orders").where("userId","==",userId)
-    .onSnapshot(snapshot=>{
-      snapshot.docChanges().forEach(change=>{
-        if(change.type==="modified"){
-          const order = change.doc.data();
-          alert("Update: Your order is now "+order.status);
-        }
-      });
+  // Login/Register
+  function googleLogin(){
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).then(result=>{
+      const user = result.user;
+      document.getElementById("loginCard").style.display="none";
+      showProfile(user);
+      checkCustomerExists(user);
     });
-}
+  }
+  function emailLogin(){
+    const email = document.getElementById("emailLogin").value;
+    const password = document.getElementById("passwordLogin").value;
+    auth.signInWithEmailAndPassword(email,password)
+      .then(result=>{
+        const user = result.user;
+        document.getElementById("loginCard").style.display="none";
+        showProfile(user);
+        checkCustomerExists(user);
+      }).catch(err=>alert(err.message));
+  }
+  function emailRegister(){
+    const email = document.getElementById("emailLogin").value;
+    const password = document.getElementById("passwordLogin").value;
+    auth.createUserWithEmailAndPassword(email,password)
+      .then(()=>alert("Registration successful! Please login now."))
+      .catch(err=>alert(err.message));
+  }
 
-db.collection("orders").onSnapshot(snapshot=>{
-  snapshot.docChanges().forEach(change=>{
-    if(change.type==="added"){
-      const order = change.doc.data();
-      alert("New Order Placed! by "+order.name);
-    }
-  });
-});
+  // Logout
+  function logout(){
+    auth.signOut().then(()=>{
+      document.getElementById("profileCard").style.display="none";
+      document.getElementById("customerCard").style.display="none";
+      document.getElementById("productsCard").style.display="none";
+      document.getElementById("orderCard").style.display="none";
+      document.getElementById("helpDeskCard").style.display="none";
+      document.getElementById("cartSummary").style.display="none";
+      document.getElementById("loginCard").style.display="block";
+    });
+  }
 
-db.collection("users").onSnapshot(snapshot=>{
-  snapshot.docChanges().forEach(change=>{
-    if(change.type==="added"){
-      const user = change.doc.data();
-      alert("New Customer Login: "+user.name+" ("+user.email+")");
-    }
-  });
-});
+  // Check if customer exists
+  function checkCustomerExists(user){
+    db.collection('users').doc(user.uid).get().then(doc=>{
+      if(doc.exists){
+        showShop();
+      } else {
+        document.getElementById("customerCard").style.display="block";
+      }
+    });
+  }
 
-db.collection("helpdesk").where("status","==","pending").onSnapshot(snapshot=>{
-  snapshot.docChanges().forEach(change=>{
-    if(change.type==="added"){
-      const msg = change.doc.data();
-      alert("New Help Desk Message from "+msg.name+": "+msg.message);
-    }
-  });
-});
+  // Save Customer Details
+  function saveCustomerDetails(){
+    const user = auth.currentUser;
+    if(!user){ alert("Login first"); return; }
+    const data = {
+      name: document.getElementById("custName").value,
+      phone: document.getElementById("custPhone").value,
+      address:{
+        door: document.getElementById("custDoor").value,
+        street: document.getElementById("custStreet").value,
+        village: document.getElementById("custVillage").value,
+        pincode: document.getElementById("custPincode").value,
+        district: document.getElementById("custDistrict").value,
+        city: document.getElementById("custCity").value,
+        state: document.getElementById("custState").value
+      },
+      email: user.email,
+      profilePic: user.photoURL
+    };
+    db.collection('users').doc(user.uid).set(data,{merge:true})
+      .then(()=>{
+        alert("Details saved! Proceed to shop.");
+        document.getElementById("customerCard").style.display="none";
+        showShop();
+      }).catch(err=>alert(err.message));
+  }
+
+  // Products & Shop
+  let cart=[];
+  const products=[
+    {name:"Chicken Boneless Pickle", price:900, img:"https://via.placeholder.com/80", category:"nonveg"},
+    {name:"Mutton Boneless Pickle", price:1650, img:"https://via.placeholder.com/80", category:"nonveg"},
+    {name:"Small Prawn Pickle", price:600, img:"https://via.placeholder.com/80", category:"nonveg"},
+    {name:"Veg Pickle", price:400, img:"https://via.placeholder.com/80", category:"veg"},
+    {name:"Chikki Special", price:350, img:"https://via.placeholder.com/80", category:"chikkis"}
+  ];
+
+  function showShop(){
+    document.getElementById("categoryTabs").style.display="flex";
+    document.getElementById("productsCard").style.display="block";
+    document.getElementById("orderCard").style.display="block";
+    document.getElementById("helpDeskCard").style.display="block";
+    renderProducts("all");
+  }
+
+  function renderProducts(cat){
+    const container=document.getElementById("productsCard");
+    container.innerHTML="";
+    products.forEach(p=>{
+      if(cat==="all"||cat===p.category){
+        const div=document.createElement("div");
+        div.className="product-card";
+        div.innerHTML=`<img src="${p.img}">
+          <div class="product-details">
+            <h4>${p.name}</h4>
+            <p>₹${p.price}</p>
+            <input type="number" min="1" value="1" class="productQty" data-price="${p.price}">
+            <button onclick="addToCart('${p.name}',${p.price},this)">Add to Cart</button>
+          </div>`;
+        container.appendChild(div);
+      }
+    });
+  }
+
+  function filterCategory(cat){ renderProducts(cat); }
+
+  function addToCart(name,price,btn){
+    const qty=Number(btn.parentElement.querySelector(".productQty").value);
+    cart.push({name,price,qty});
+    updateCartSummary();
+    alert(name+" added to cart!");
+  }
+
+  function updateCartSummary(){
+    const summary=document.getElementById("cartSummary");
+    summary.style.display="block";
+    const container=document.getElementById("cartItems");
+    container.innerHTML="";
+    let total=0;
+    cart.forEach(item=>{
+      container.innerHTML+=`<p>${item.name} x ${item.qty} = ₹${item.price*item.qty}</p>`;
+      total+=item.price*item.qty;
+    });
+    document.getElementById("cartTotal").innerText="Total: ₹"+total;
+  }
+
+  // Payment
+  async function payNow(){
+    if(cart.length===0){ alert("Add products to cart"); return; }
+    const location=document.getElementById("location").value;
+    const doc=await db.collection("settings").doc("shipping").get();
+    const shipping=doc.exists?doc.data()[location]||0:0;
+    let total=0; cart.forEach(item=>total+=item.price*item.qty);
+    total+=shipping;
+    document.getElementById("totalText").innerText="Products + Shipping = ₹"+total;
+
+    var options={key:"rzp_live_SI5VMj6l9U45sn", amount:total*100, currency:"INR",
+      name:"SR FOOD'S", description:"Food Order Payment",
+      handler:function(response){
+        alert("Payment Success! Payment ID: "+response.razorpay_payment_id);
+        saveOrder(response.razorpay_payment_id);
+      },
+      theme:{color:"#fc8019"}
+    };
+    new Razorpay(options).open();
+  }
+
+  function saveOrder(paymentId){
+    const user=auth.currentUser;
+    db.collection("orders").add({
+      userId:user.uid,
+      cart:cart,
+      location:document.getElementById("location").value,
+      paymentId:paymentId,
+      timestamp:firebase.firestore.FieldValue.serverTimestamp(),
+      status:"pending"
+    }).then(()=>{alert("Order saved!"); cart=[]; updateCartSummary();});
+  }
+
+  // Help Desk
+  function sendHelpMessage(){
+    const msg=document.getElementById("helpMessage").value;
+    const user=auth.currentUser;
+    if(!msg || !user){ alert("Login and enter message"); return; }
+    db.collection("helpdesk").add({userId:user.uid,message:msg,timestamp:firebase.firestore.FieldValue.serverTimestamp(),status:"pending"})
+      .then(()=>{alert("Message sent!"); document.getElementById("helpMessage").value="";});
+  }
+
 </script>
-
 </body>
 </html>
