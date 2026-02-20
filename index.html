@@ -22,7 +22,7 @@ header img.logo { height:50px; margin-right:10px; }
 header .icons { display:flex; align-items:center; gap:15px; }
 button { background:#fc8019; color:white; border:none; padding:10px 15px; border-radius:6px; font-size:16px; cursor:pointer; }
 button:hover { background:#e67300; }
-.container { padding:100px 20px 50px 20px; max-width:900px; margin:auto; }
+.container { padding:100px 20px 50px 20px; max-width:1200px; margin:auto; }
 
 /* Slide menu */
 .slide-menu { position:fixed; top:0; left:-300px; width:300px; height:100%; background:white; box-shadow:2px 0 10px rgba(0,0,0,0.2); transition:0.3s; z-index:1100; padding:20px; overflow-y:auto; }
@@ -35,34 +35,50 @@ button:hover { background:#e67300; }
 .slide-menu .instagram-follow a { display:inline-block; background:#fc8019; color:white; font-weight:bold; padding:12px 20px; border-radius:8px; text-decoration:none; font-size:16px; transition:0.3s; }
 .slide-menu .instagram-follow a:hover { background:#e67300; transform:scale(1.05); }
 
-/* Product Cards */
-.product-card { background:white; padding:15px; border-radius:10px; margin-bottom:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:flex; align-items:center; gap:15px; }
-.product-card img { width:80px; height:80px; border-radius:10px; object-fit:cover; }
-.product-card .details { flex:1; }
-.product-card .details h3 { margin:0 0 5px 0; }
-.product-card .details p { margin:0 0 10px 0; }
-.product-card .actions { display:flex; flex-direction:column; gap:5px; }
+/* Grid Products */
+#products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+}
+.product-card { 
+  display:flex; 
+  flex-direction:column; 
+  align-items:center; 
+  padding:15px; 
+  border-radius:10px; 
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
+  background:white;
+}
+.product-card img { width:100%; height:150px; object-fit:cover; border-radius:8px; }
+.product-card .details { text-align:center; margin:10px 0; }
+.product-card .actions { width:100%; display:flex; justify-content:space-between; align-items:center; gap:5px; }
+.product-card .disclaimer { font-size:14px; color:#555; margin-top:5px; display:none; }
 
 /* Cart Summary */
-#cart-summary { position:fixed; bottom:0; left:0; width:100%; background:white; box-shadow:0 -2px 5px rgba(0,0,0,0.1); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; z-index:1050; }
-#cart-summary span { font-weight:bold; }
-#cart-summary button { width:auto; padding:8px 15px; }
+#cart-container { margin-top:30px; display:none; }
+.cart-item { display:flex; justify-content:space-between; background:#fff; padding:10px; margin-bottom:10px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+.cart-item input { width:50px; padding:3px; }
+.cart-item button { background:red; padding:5px 10px; border-radius:5px; color:white; border:none; cursor:pointer; }
+#cart-bill { font-weight:bold; margin-top:10px; }
 
 /* About Us */
 .about-us { padding:50px 20px; text-align:center; background:#f9f9f9; }
 .about-us img.logo { height:100px; margin-bottom:10px; }
 .about-us h1 { color:#fc8019; margin:5px 0; }
+.about-us h3 { color:#333; margin:5px 0; }
 .about-us p { max-width:700px; margin:auto; line-height:1.7; color:#333; }
-.about-us .contact a { color:#fc8019; text-decoration:none; font-weight:bold; }
+.about-us .contact a { color:#fc8019; text-decoration:none; font-weight:bold; margin:0 5px; }
 
-/* Editable Cart */
-.cart-item { display:flex; justify-content:space-between; background:#fff; padding:10px; margin-bottom:10px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-.cart-item input { width:50px; padding:3px; }
-.cart-item button { background:red; padding:5px 10px; border-radius:5px; }
+/* Review Section */
+.review-section { padding:30px 20px; max-width:700px; margin:auto; background:white; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-top:30px; }
+.review-section h3 { margin-top:0; }
+.review-section textarea { width:100%; padding:8px; margin:5px 0; border-radius:5px; border:1px solid #ccc; }
+.review-section input[type="text"] { width:100%; padding:8px; margin:5px 0; border-radius:5px; border:1px solid #ccc; }
+.review-section button { width:100%; padding:10px; margin-top:5px; }
 
 /* Responsive */
 @media(max-width:768px){
-  .product-card { flex-direction:column; align-items:flex-start; }
   header h1 { font-size:20px; }
   header img.logo { height:40px; }
 }
@@ -102,7 +118,7 @@ button:hover { background:#e67300; }
 <!-- Main Container -->
 <div class="container">
 
-  <!-- Login / Register -->
+  <!-- Login/Register -->
   <div class="card" id="login-card">
     <h3>Login / Register</h3>
     <input type="email" id="email" placeholder="Email">
@@ -113,31 +129,34 @@ button:hover { background:#e67300; }
     <button onclick="loginGoogle()">Login with Google</button>
   </div>
 
-  <!-- Products / Menu -->
-  <h2 style="margin:30px 0;">Our Menu</h2>
-  <div id="products">
-    <!-- Product cards will be appended here -->
+  <!-- Personal Details & Address (shown after login) -->
+  <div class="card" id="details-card" style="display:none; margin-top:30px;">
+    <h3>Personal Details & Address</h3>
+    <input type="text" id="cust-name" placeholder="Full Name" required><br>
+    <input type="text" id="cust-phone" placeholder="Phone Number" required><br>
+    <input type="text" id="door" placeholder="Door No" required><br>
+    <input type="text" id="street" placeholder="Street Name" required><br>
+    <input type="text" id="landmark" placeholder="Landmark"><br>
+    <input type="text" id="village" placeholder="Village"><br>
+    <input type="text" id="pincode" placeholder="Pincode" required><br>
+    <input type="text" id="district" placeholder="District" required><br>
+    <input type="text" id="city" placeholder="City" required><br>
+    <input type="text" id="state" placeholder="State" required><br>
+    <button onclick="proceedToProducts()">Save Details</button>
   </div>
 
-  <!-- Cart & Bill Modal -->
-  <div id="cart-container" style="display:none; margin-top:30px;">
+  <!-- Products Grid -->
+  <h2 style="margin:30px 0;">Our Menu</h2>
+  <div id="products">
+    <!-- Product cards appended by JS -->
+  </div>
+
+  <!-- Cart & Bill -->
+  <div id="cart-container">
     <h3>Cart & Bill</h3>
     <div id="cart-items"></div>
     <p id="cart-bill">Subtotal: ₹0 | Free Delivery | Total: ₹0</p>
-
-    <!-- Address Form -->
-    <div id="address-form" style="margin-top:20px;">
-      <h4>Enter Delivery Address</h4>
-      <input type="text" id="door" placeholder="Door No" required><br>
-      <input type="text" id="street" placeholder="Street Name" required><br>
-      <input type="text" id="landmark" placeholder="Landmark"><br>
-      <input type="text" id="village" placeholder="Village"><br>
-      <input type="text" id="pincode" placeholder="Pincode" required><br>
-      <input type="text" id="district" placeholder="District" required><br>
-      <input type="text" id="city" placeholder="City" required><br>
-      <input type="text" id="state" placeholder="State" required><br>
-      <button onclick="payNow()">Proceed to Payment</button>
-    </div>
+    <button onclick="payNow()">Proceed to Payment</button>
   </div>
 
 </div>
@@ -146,19 +165,33 @@ button:hover { background:#e67300; }
 <section class="about-us">
   <img src="your-logo.png" alt="SR FOOD'S Logo" class="logo">
   <h1>SR FOOD'S</h1>
+  <h3>AUTHENTIC GODAVARI TASTE</h3>
   <p>Since 2024</p>
-  <p>Welcome to SR FOOD’S – your destination for the finest pickles, sweets, snacks, and SR FOOD’S Specials made with love, quality, and authentic taste. We take pride in crafting our products using traditional recipes and premium ingredients, ensuring a unique taste in every bite.</p>
-  <div class="contact">
-    Contact us via WhatsApp: <a href="https://wa.me/9492369911" target="_blank">+91 9492369911</a>
-  </div>
-  <div class="instagram-follow" style="margin-top:20px;">
-    <a href="https://www.instagram.com/sr_foods_offical" target="_blank">Follow us on Instagram</a>
+  <p>Welcome to SR FOOD’S – your destination for the finest pickles, sweets, snacks, and SR FOOD’S Specials made with love, quality, and authentic taste. 
+    We take pride in crafting our products using traditional recipes and premium ingredients, ensuring a unique taste in every bite.
+  </p>
+  <div style="margin-top:20px; display:flex; justify-content:center; gap:20px;">
+    <a href="https://www.instagram.com/sr_foods_offical" target="_blank" style="display:flex; align-items:center; gap:5px; background:#fc8019; color:white; font-weight:bold; padding:10px 15px; border-radius:8px; text-decoration:none;">
+      <img src="instagram-logo.png" alt="Instagram" style="height:20px;"> Follow us
+    </a>
+    <a href="https://wa.me/9492369911" target="_blank" style="display:flex; align-items:center; gap:5px; background:#25D366; color:white; font-weight:bold; padding:10px 15px; border-radius:8px; text-decoration:none;">
+      <img src="whatsapp-logo.png" alt="WhatsApp" style="height:20px;"> Contact Us
+    </a>
   </div>
 </section>
 
-<!-- Firebase & JS -->
+<!-- Review Section -->
+<div class="review-section">
+  <h3>Customer Reviews</h3>
+  <input type="text" id="review-name" placeholder="Your Name">
+  <textarea id="review-comment" placeholder="Write your review here"></textarea>
+  <button onclick="addReview()">Submit Review</button>
+  <div id="reviews-display" style="margin-top:20px;"></div>
+</div>
+
+<!-- JS -->
 <script>
-// Firebase initialization
+// Firebase init
 const firebaseConfig = {
   apiKey: "AIzaSyCHg-gxVV-vuALSZgcGBabChPZnznTlySg",
   authDomain: "sr-food-wonders-demo.firebaseapp.com",
@@ -168,39 +201,40 @@ const firebaseConfig = {
   appId: "1:895619294540:web:72cee3f5756daa116b1be9"
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
 
 // Slide menu toggle
 document.getElementById('menu-toggle').addEventListener('click', ()=>{
   document.getElementById('slide-menu').classList.toggle('active');
 });
 
-// Placeholder login/register functions
-function loginEmail(){ alert('Login with email not implemented'); }
-function registerEmail(){ alert('Register with email not implemented'); }
-function loginGoogle(){ alert('Google login not implemented'); }
-function logout(){ alert('Logout not implemented'); }
+// Placeholder login/register
+function loginEmail(){ alert('Login with email'); document.getElementById('login-card').style.display='none'; document.getElementById('details-card').style.display='block'; }
+function registerEmail(){ alert('Register new user'); document.getElementById('login-card').style.display='none'; document.getElementById('details-card').style.display='block'; }
+function loginGoogle(){ alert('Google login'); document.getElementById('login-card').style.display='none'; document.getElementById('details-card').style.display='block'; }
+function logout(){ alert('Logout'); }
 function showSection(section){ alert('Open section: '+section); }
 
-// Products Data
+// Personal Details → proceed to products
+function proceedToProducts(){ alert('Details saved. You can now shop.'); }
+
+// Products
 const productsData = [
-  {name:"Chicken Pickle Bone", price:1100, img:"https://via.placeholder.com/80"},
-  {name:"Chicken Gongura Pickle Bone", price:1050, img:"https://via.placeholder.com/80"},
-  {name:"Chicken Boneless Pickle", price:1200, img:"https://via.placeholder.com/80"},
-  {name:"Chicken Boneless Gongura Pickle", price:1150, img:"https://via.placeholder.com/80"},
-  {name:"Mutton Pickle Bone", price:2000, img:"https://via.placeholder.com/80"},
-  {name:"Mutton Gongura Pickle Bone", price:1900, img:"https://via.placeholder.com/80"},
-  {name:"Mutton Boneless Pickle", price:2200, img:"https://via.placeholder.com/80"},
-  {name:"Mutton Boneless Gongura Pickle", price:2100, img:"https://via.placeholder.com/80"},
-  {name:"Prawn Pickel Big", price:2000, img:"https://via.placeholder.com/80"},
-  {name:"Prawn Gongura Pickle", price:1900, img:"https://via.placeholder.com/80"},
-  {name:"Methadlu Fish Pickle", price:1500, img:"https://via.placeholder.com/80"},
-  {name:"Normal Fish Pickle", price:1500, img:"https://via.placeholder.com/80"},
-  {name:"Korameenu Fish Pickle", price:2400, img:"https://via.placeholder.com/80"},
-  {name:"Sandhuva Fish Pickle", price:2400, img:"https://via.placeholder.com/80"},
-  {name:"Vanjaram Fish Pickle", price:2400, img:"https://via.placeholder.com/80"},
-  {name:"Pandu Kappa Fish Pickle", price:2400, img:"https://via.placeholder.com/80"}
+  {name:"Chicken Pickle Bone", price:1100, disclaimer:"Freshly made, contains spices, keep refrigerated.", img:"https://via.placeholder.com/150"},
+  {name:"Chicken Gongura Pickle Bone", price:1050, disclaimer:"Spicy and tasty.", img:"https://via.placeholder.com/150"},
+  {name:"Chicken Boneless Pickle", price:1200, disclaimer:"Boneless and soft.", img:"https://via.placeholder.com/150"},
+  {name:"Chicken Boneless Gongura Pickle", price:1150, disclaimer:"Special Gongura flavor.", img:"https://via.placeholder.com/150"},
+  {name:"Mutton Pickle Bone", price:2000, disclaimer:"Bone-in, fresh.", img:"https://via.placeholder.com/150"},
+  {name:"Mutton Gongura Pickle Bone", price:1900, disclaimer:"Traditional taste.", img:"https://via.placeholder.com/150"},
+  {name:"Mutton Boneless Pickle", price:2200, disclaimer:"Boneless, premium quality.", img:"https://via.placeholder.com/150"},
+  {name:"Mutton Boneless Gongura Pickle", price:2100, disclaimer:"Spicy & tangy.", img:"https://via.placeholder.com/150"},
+  {name:"Prawn Pickel Big", price:2000, disclaimer:"Fresh big prawns.", img:"https://via.placeholder.com/150"},
+  {name:"Prawn Gongura Pickle", price:1900, disclaimer:"Tangy flavor.", img:"https://via.placeholder.com/150"},
+  {name:"Methadlu Fish Pickle", price:1500, disclaimer:"Spicy fish pickle.", img:"https://via.placeholder.com/150"},
+  {name:"Normal Fish Pickle", price:1500, disclaimer:"Classic taste.", img:"https://via.placeholder.com/150"},
+  {name:"Korameenu Fish Pickle", price:2400, disclaimer:"Premium fish.", img:"https://via.placeholder.com/150"},
+  {name:"Sandhuva Fish Pickle", price:2400, disclaimer:"Spicy & tangy.", img:"https://via.placeholder.com/150"},
+  {name:"Vanjaram Fish Pickle", price:2400, disclaimer:"Special Vanjaram fish.", img:"https://via.placeholder.com/150"},
+  {name:"Pandu Kappa Fish Pickle", price:2400, disclaimer:"Authentic taste.", img:"https://via.placeholder.com/150"}
 ];
 
 let cart = [];
@@ -209,40 +243,46 @@ let cart = [];
 const productsDiv = document.getElementById('products');
 productsData.forEach((p,i)=>{
   const card = document.createElement('div');
-  card.className = "product-card";
-  card.innerHTML = `
+  card.className="product-card";
+  card.innerHTML=`
     <img src="${p.img}" alt="${p.name}">
     <div class="details">
       <h3>${p.name}</h3>
       <p>₹${p.price}</p>
+      <button onclick="toggleDisclaimer(${i})">View Details</button>
     </div>
     <div class="actions">
-      <input type="number" id="qty-${i}" value="1" min="1" style="width:60px; padding:5px;">
+      <input type="number" id="qty-${i}" value="1" min="1">
       <button onclick="addToCart(${i})">Add to Cart</button>
     </div>
+    <p class="disclaimer" id="disclaimer-${i}">${p.disclaimer}</p>
   `;
   productsDiv.appendChild(card);
 });
 
-// Add to Cart
+function toggleDisclaimer(index){
+  const el = document.getElementById(`disclaimer-${index}`);
+  el.style.display = el.style.display==='block'?'none':'block';
+}
+
 function addToCart(index){
   const qty = Number(document.getElementById(`qty-${index}`).value);
   const prod = productsData[index];
   const existing = cart.find(c=>c.name===prod.name);
   if(existing){ existing.qty += qty; } else { cart.push({name:prod.name, price:prod.price, qty:qty}); }
-  updateCartDisplay();
+  updateCart();
 }
 
-// Update Cart Display
-function updateCartDisplay(){
+// Update Cart
+function updateCart(){
   const cartContainer = document.getElementById('cart-container');
-  cartContainer.style.display = cart.length ? 'block':'none';
+  cartContainer.style.display = cart.length?'block':'none';
   const cartItems = document.getElementById('cart-items');
-  cartItems.innerHTML = '';
+  cartItems.innerHTML='';
   cart.forEach((item,i)=>{
     const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
+    div.className='cart-item';
+    div.innerHTML=`
       <span>${item.name} (₹${item.price})</span>
       <div>
         Qty: <input type="number" value="${item.qty}" min="1" onchange="changeQty(${i},this.value)">
@@ -251,46 +291,4 @@ function updateCartDisplay(){
     `;
     cartItems.appendChild(div);
   });
-  updateBill();
-}
-
-// Change Quantity
-function changeQty(index,val){
-  cart[index].qty = Number(val);
-  updateBill();
-}
-
-// Remove Item
-function removeItem(index){
-  cart.splice(index,1);
-  updateCartDisplay();
-}
-
-// Update Bill
-function updateBill(){
-  const total = cart.reduce((a,b)=>a+b.price*b.qty,0);
-  document.getElementById('cart-bill').innerText = `Subtotal: ₹${total} | Free Delivery | Total: ₹${total}`;
-}
-
-// Proceed to Payment
-function payNow(){
-  const address = {
-    door: document.getElementById('door').value,
-    street: document.getElementById('street').value,
-    landmark: document.getElementById('landmark').value,
-    village: document.getElementById('village').value,
-    pincode: document.getElementById('pincode').value,
-    district: document.getElementById('district').value,
-    city: document.getElementById('city').value,
-    state: document.getElementById('state').value
-  };
-  if(!address.door || !address.street || !address.pincode || !address.city || !address.state){
-    alert('Please fill required address fields.');
-    return;
-  }
-  alert('Proceed to payment (Razorpay integration placeholder)');
-}
-</script>
-
-</body>
-</html>
+  const total = cart.reduce((a,b)=>a+b.price*b.qty,
