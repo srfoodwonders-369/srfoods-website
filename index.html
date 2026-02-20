@@ -13,7 +13,6 @@
 <!-- Razorpay -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-<!-- Styles -->
 <style>
 body { font-family: Arial, sans-serif; margin:0; background:#f9f9f9; }
 header { display:flex; align-items:center; justify-content:space-between; padding:15px 20px; background:white; box-shadow:0 2px 5px rgba(0,0,0,0.1); position:fixed; width:100%; z-index:1000;}
@@ -32,8 +31,6 @@ button:hover { background:#e67300; }
 .slide-menu .menu-item:hover { color:#fc8019; }
 .slide-menu .profile { text-align:center; margin-bottom:20px; }
 .slide-menu .profile img { width:80px; height:80px; border-radius:50%; margin-bottom:10px; }
-.slide-menu .instagram-follow a { display:inline-block; background:#fc8019; color:white; font-weight:bold; padding:12px 20px; border-radius:8px; text-decoration:none; font-size:16px; transition:0.3s; }
-.slide-menu .instagram-follow a:hover { background:#e67300; transform:scale(1.05); }
 
 /* Grid Products */
 #products {
@@ -86,7 +83,6 @@ button:hover { background:#e67300; }
 </head>
 <body>
 
-<!-- Header -->
 <header>
   <div style="display:flex; align-items:center;">
     <img src="your-logo.png" alt="SR FOOD'S Logo" class="logo">
@@ -115,7 +111,6 @@ button:hover { background:#e67300; }
   </div>
 </div>
 
-<!-- Main Container -->
 <div class="container">
 
   <!-- Login/Register -->
@@ -129,7 +124,7 @@ button:hover { background:#e67300; }
     <button onclick="loginGoogle()">Login with Google</button>
   </div>
 
-  <!-- Personal Details & Address (shown after login) -->
+  <!-- Personal Details & Address -->
   <div class="card" id="details-card" style="display:none; margin-top:30px;">
     <h3>Personal Details & Address</h3>
     <input type="text" id="cust-name" placeholder="Full Name" required><br>
@@ -145,11 +140,8 @@ button:hover { background:#e67300; }
     <button onclick="proceedToProducts()">Save Details</button>
   </div>
 
-  <!-- Products Grid -->
   <h2 style="margin:30px 0;">Our Menu</h2>
-  <div id="products">
-    <!-- Product cards appended by JS -->
-  </div>
+  <div id="products"></div>
 
   <!-- Cart & Bill -->
   <div id="cart-container">
@@ -158,10 +150,9 @@ button:hover { background:#e67300; }
     <p id="cart-bill">Subtotal: ₹0 | Free Delivery | Total: ₹0</p>
     <button onclick="payNow()">Proceed to Payment</button>
   </div>
-
 </div>
 
-<!-- About Us Section -->
+<!-- About Us -->
 <section class="about-us">
   <img src="your-logo.png" alt="SR FOOD'S Logo" class="logo">
   <h1>SR FOOD'S</h1>
@@ -180,7 +171,7 @@ button:hover { background:#e67300; }
   </div>
 </section>
 
-<!-- Review Section -->
+<!-- Reviews -->
 <div class="review-section">
   <h3>Customer Reviews</h3>
   <input type="text" id="review-name" placeholder="Your Name">
@@ -189,9 +180,8 @@ button:hover { background:#e67300; }
   <div id="reviews-display" style="margin-top:20px;"></div>
 </div>
 
-<!-- JS -->
 <script>
-// Firebase init
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCHg-gxVV-vuALSZgcGBabChPZnznTlySg",
   authDomain: "sr-food-wonders-demo.firebaseapp.com",
@@ -201,23 +191,57 @@ const firebaseConfig = {
   appId: "1:895619294540:web:72cee3f5756daa116b1be9"
 };
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 // Slide menu toggle
 document.getElementById('menu-toggle').addEventListener('click', ()=>{
   document.getElementById('slide-menu').classList.toggle('active');
 });
 
-// Placeholder login/register
-function loginEmail(){ alert('Login with email'); document.getElementById('login-card').style.display='none'; document.getElementById('details-card').style.display='block'; }
-function registerEmail(){ alert('Register new user'); document.getElementById('login-card').style.display='none'; document.getElementById('details-card').style.display='block'; }
-function loginGoogle(){ alert('Google login'); document.getElementById('login-card').style.display='none'; document.getElementById('details-card').style.display='block'; }
-function logout(){ alert('Logout'); }
-function showSection(section){ alert('Open section: '+section); }
+// Login/Register
+function registerEmail(){
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  auth.createUserWithEmailAndPassword(email,password)
+  .then(u=>{
+    alert("Registered successfully");
+    showDetailsCard(u.user);
+  }).catch(err=>alert(err.message));
+}
 
-// Personal Details → proceed to products
-function proceedToProducts(){ alert('Details saved. You can now shop.'); }
+function loginEmail(){
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  auth.signInWithEmailAndPassword(email,password)
+  .then(u=>{
+    alert("Login successful");
+    showDetailsCard(u.user);
+  }).catch(err=>alert(err.message));
+}
 
-// Products
+function loginGoogle(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).then(result=>{
+    alert("Google login successful");
+    showDetailsCard(result.user);
+  }).catch(err=>alert(err.message));
+}
+
+function showDetailsCard(user){
+  document.getElementById('login-card').style.display='none';
+  document.getElementById('details-card').style.display='block';
+  document.getElementById('profile-name').innerText = user.displayName || "New User";
+  document.getElementById('profile-email').innerText = user.email;
+}
+
+function logout(){
+  auth.signOut().then(()=>location.reload());
+}
+
+function proceedToProducts(){ alert("Details saved! You can now shop."); }
+
+// Products & Cart
 const productsData = [
   {name:"Chicken Pickle Bone", price:1100, disclaimer:"Freshly made, contains spices, keep refrigerated.", img:"https://via.placeholder.com/150"},
   {name:"Chicken Gongura Pickle Bone", price:1050, disclaimer:"Spicy and tasty.", img:"https://via.placeholder.com/150"},
@@ -238,13 +262,11 @@ const productsData = [
 ];
 
 let cart = [];
-
-// Render products
 const productsDiv = document.getElementById('products');
+
 productsData.forEach((p,i)=>{
-  const card = document.createElement('div');
-  card.className="product-card";
-  card.innerHTML=`
+  const card = document.createElement('div'); card.className="product-card";
+  card.innerHTML = `
     <img src="${p.img}" alt="${p.name}">
     <div class="details">
       <h3>${p.name}</h3>
@@ -273,22 +295,17 @@ function addToCart(index){
   updateCart();
 }
 
-// Update Cart
 function updateCart(){
   const cartContainer = document.getElementById('cart-container');
   cartContainer.style.display = cart.length?'block':'none';
-  const cartItems = document.getElementById('cart-items');
-  cartItems.innerHTML='';
+  const cartItems = document.getElementById('cart-items'); cartItems.innerHTML='';
+  let total=0;
   cart.forEach((item,i)=>{
-    const div = document.createElement('div');
-    div.className='cart-item';
-    div.innerHTML=`
-      <span>${item.name} (₹${item.price})</span>
-      <div>
-        Qty: <input type="number" value="${item.qty}" min="1" onchange="changeQty(${i},this.value)">
-        <button onclick="removeItem(${i})">Remove</button>
-      </div>
-    `;
+    total += item.price*item.qty;
+    const div = document.createElement('div'); div.className='cart-item';
+    div.innerHTML=`<span>${item.name} (₹${item.price})</span>
+      <div>Qty: <input type="number" value="${item.qty}" min="1" onchange="changeQty(${i},this.value)">
+      <button onclick="removeItem(${i})">Remove</button></div>`;
     cartItems.appendChild(div);
   });
-  const total = cart.reduce((a,b)=>a+b.price*b.qty,
+  document.getElementById('cart
